@@ -5,16 +5,22 @@
 </template>
 
 <script>
-import Sudoku from './Sudoku.vue';
-import 'purecss/build/pure-min.css';
+import Sudoku from "./Sudoku.vue";
+import "purecss/build/pure-min.css";
 
 export default {
     components: {
-        'sudoku': Sudoku
+        sudoku: Sudoku
     }
 };
 </script>
 
 <style>
+html {
+    box-sizing: border-box;
+}
 
+*, *::before, *::after {
+    box-sizing: inherit;
+}
 </style>

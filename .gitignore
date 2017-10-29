@@ -6,3 +6,7 @@ build
 
 #config
 .eslintrc.js
+.vscode
+
+#temp files
+*.swp
