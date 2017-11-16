@@ -16,14 +16,18 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.2",
-    "jquery": "^3.2.1",
+    "express-static-gzip": "^0.3.0",
+    "express-ws": "^3.0.0",
     "purecss": "^1.0.0",
-    "vue": "^2.5.2"
+    "vue": "^2.5.2",
+    "ws": "^3.2.0"
   },
   "devDependencies": {
+    "compression-webpack-plugin": "^1.0.1",
     "copy-webpack-plugin": "^4.2.0",
     "css-loader": "^0.28.7",
     "style-loader": "^0.19.0",
+    "uglifyjs-webpack-plugin": "^1.0.1",
     "vue-loader": "^13.3.0",
     "vue-template-compiler": "^2.5.2",
     "webpack": "^3.8.1"

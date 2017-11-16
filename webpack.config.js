@@ -1,6 +1,7 @@
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const webpack = require('webpack');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
     entry: './src/index.js',
@@ -16,9 +17,7 @@ module.exports = {
     },
     plugins: [
         new CopyWebpackPlugin([{ from: path.join(__dirname, 'public'), to: path.join(__dirname, 'build') }]),
-        new webpack.ProvidePlugin({
-            $: 'jquery',
-            jQuery: 'jquery'
-        }),
+        //new UglifyJSPlugin(),
+        new CompressionPlugin(),
     ]
 };

@@ -20,9 +20,8 @@
 </template>
 
 <script>
-import $ from "jquery";
-
 export default {
+    props: ['socket'],
     data() {
         return {
             cells: [],
@@ -31,11 +30,43 @@ export default {
     },
     methods: {
         sendUpdate() {},
+        startSocket(socket) {
+            this.socket = socket;
+            this.socket.addEventListener('message', (event) => {
+                var message = JSON.parse(event.data);
+                if (message.cells) {
+                    for (var y = 0; y < 9; y++) {
+                        for (var x = 0; x < 9; x++) {
+                            this.cells[y][x].number = message.cells[y][x].number;
+                            for (var digit = 0; digit < 9; digit++) {
+                                this.$set(this.cells[y][x].numbers, digit, message.cells[y][x].numbers[digit]);
+                            }
+                        }
+                    }
+                } else if (message.write) {
+                    console.log(message);
+                    if (message.type == 'small-number') {
+                        this.$set(this.cells[message.y][message.x].numbers, message.digit, message.set);
+                    } else if (message.type == 'large-number') {
+                        this.cells[message.y][message.x].number = message.set;
+                    }
+                }
+            });
+        },
         toggle(x, y, index) {
             this.$set(
                 this.cells[y][x].numbers,
                 index, !this.cells[y][x].numbers[index]
             );
+            this.socket.send(JSON.stringify({
+                broadcast: true,
+                write: true,
+                x,
+                y,
+                digit: index,
+                set: this.cells[y][x].numbers[index],
+                type: 'small-number',
+            }));
         },
         select(x, y) {
             if (this.selected.x != null && this.selected.y != null) {
@@ -45,11 +76,29 @@ export default {
                 this.selected.x = x;
                 this.selected.y = y;
                 this.cells[y][x].selected = true;
+            } else {
+                this.selected.x = null;
+                this.selected.y = null;
             }
         },
         keypress(event) {
-            if (event.key >= 1 && event.key <= 9 && this.selected.x != null && this.selected.y != null) {
-                this.cells[this.selected.y][this.selected.x].number = event.key;
+            if (this.selected.x != null && this.selected.y != null) {
+                var value;
+                if (event.key >= 1 && event.key <= 9) {
+                    value = event.key;
+                } else {
+                    value = null;
+                }
+
+                this.cells[this.selected.y][this.selected.x].number = value;
+                this.socket.send(JSON.stringify({
+                    broadcast: true,
+                    write: true,
+                    x: this.selected.x,
+                    y: this.selected.y,
+                    set: value,
+                    type: 'large-number',
+                }));
             }
             this.select(null);
         }
@@ -85,7 +134,7 @@ table {
     border: 1px solid;
     text-align: center;
     vertical-align: top;
-    padding: 4px 4px;
+    position: relative;
 }
 .sudoku-cell:first-child {
     border-left: solid;
@@ -101,30 +150,34 @@ table {
 }
 
 .number-small {
-    width: 10%;
     height: 1em;
     font-size: 0.8em;
-    text-align: center;
     line-height: 1em;
 }
 
 .number-large {
     width: 100%;
-    height: 2em;
-    font-size: 1.8em;
-    text-align: center;
-    line-height: 2em;
+    height: 100%;
+    font-size: 2.2em;
+    align-items: center;
+    justify-content: center;
+    display: flex;
 }
 
-.number-large.selected {
-    background-color: rgba(128, 128, 255, 0.3);
+.number-large.selected, .number-large.selected:hover {
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
 .number-list {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    top: 4px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    height: 1em;
 }
 
 .number {
@@ -132,14 +185,15 @@ table {
 }
 
 .number:hover {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.15);
 }
 
 .number-list:hover .number-off {
-    color: #bbbbbb;
+    color: #808080;
+    visibility: initial;
 }
 
 .number-off {
-    color: transparent;
+    visibility: hidden;
 }
 </style>
