@@ -147,16 +147,17 @@ function calcNFA(regex) {
                 depth--;
                 if(depth == 0) {
                     parens.push([opening, i]);
+                    opening = -1;
                 }
-                opening = -1;
             }
-        } else if(depth == 0) {
+        }
+        if(depth == 0) {
             if(regex[i] == '*') {
                 stars.push(i);
             } else if(regex[i] == '|') {
                 unions.push(i);
-            } else if(![undefined, '|', '('].includes(regex[i - 1]) && ![undefined, '|', ')', '*'].includes(regex[i])) {
-                concats.push(i);
+            } else if(![undefined, '|', '('].includes(regex[i]) && ![undefined, '|', ')', '*'].includes(regex[i + 1])) {
+                concats.push(i + 1);
             }
         }
     }
@@ -180,7 +181,6 @@ function calcNFA(regex) {
         console.assert(stars.length == 1);
         return star(regex.slice(0, -1));
     } else if(parens.length > 0) {
-        console.assert(parens.length == 1);
         return calcNFA(regex.slice(1, -1));
     } else {
         return charNFA(regex);
