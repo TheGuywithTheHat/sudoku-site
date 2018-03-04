@@ -4,6 +4,7 @@
             <router-link to="/" class="pure-menu-heading pure-menu-link">TGwTH</router-link>
             <ul class="pure-menu-list">
                 <li class="pure-menu-item"><router-link to="/sudoku" class="pure-menu-link">Sudoku</router-link></li>
+                <li class="pure-menu-item"><router-link to="/nfaaas" class="pure-menu-link">NFAaaS</router-link></li>
             </ul>
         </div>
         <keep-alive><router-view></router-view></keep-alive>
@@ -12,6 +13,7 @@
 
 <script>
 import SudokuPage from './SudokuPage.vue';
+import NFAaaS from './NFAaaS.vue';
 import VueRouter from 'vue-router';
 import 'purecss/build/pure-min.css';
 import 'purecss/build/grids-responsive-min.css';
@@ -20,23 +22,11 @@ var router = new VueRouter({
     routes: [
         { path: '/', component: null},
         { path: '/sudoku', component: SudokuPage},
+        { path: '/nfaaas', component: NFAaaS},
     ],
 });
 
-export default {
-    data() {
-        return {
-
-        }
-    },
-    methods: {
-        
-    },
-    components: {
-        'sudoku': SudokuPage,
-    },
-    router,
-};
+export default { router };
 </script>
 
 <style>
