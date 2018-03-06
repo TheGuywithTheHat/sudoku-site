@@ -8,6 +8,25 @@
 <script>
 var currentId = 0;
 
+/**
+ * @param {Object[]} edges1
+ * @param {Object[]} edges2
+ * @return {boolean}
+ */
+function edgesEqual(edges1, edges2) {
+    if(edges1.length != edges2.length) {
+
+    }
+}
+
+function edgesSubset(edges1, edges2) {
+    for(var i = 0; i < this.nodes.length; i++) {
+        for(var j = 0; j < this.nodes.length; j++) {
+
+        }
+    }
+}
+
 class NFA {
     constructor(nodes) {
         this.nodes = nodes;
@@ -26,6 +45,14 @@ class NFA {
     get end() {
         return this.nodes[this.nodes.length - 1];
     }
+
+    minimize() {
+        for(var i = 0; i < this.nodes.length; i++) {
+            for(var j = i + 1; j < this.nodes.length; j++) {
+
+            }
+        }
+    }
 }
 
 class Node {
@@ -33,6 +60,8 @@ class Node {
         this.id = currentId;
         currentId++;
         this.edges = [];
+        this.color = 'white';
+        this.border = 'white';
     }
 
     /**
@@ -44,6 +73,16 @@ class Node {
             from: this.id,
             to: (typeof to == 'object' ? to.id : to),
             label: label,
+            arrows: 'to',
+            font: {
+                size: 24,
+                color: 'white',
+                strokeWidth: 0,
+                align: 'top',
+            },
+            color: {
+                color: 'white',
+            }
         });
     }
 }
@@ -156,7 +195,8 @@ function calcNFA(regex) {
                 stars.push(i);
             } else if(regex[i] == '|') {
                 unions.push(i);
-            } else if(![undefined, '|', '('].includes(regex[i]) && ![undefined, '|', ')', '*'].includes(regex[i + 1])) {
+            }
+            if(![undefined, '|', '('].includes(regex[i]) && ![undefined, '|', ')', '*'].includes(regex[i + 1])) {
                 concats.push(i + 1);
             }
         }
