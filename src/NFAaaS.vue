@@ -14,20 +14,29 @@ var currentId = 0;
  * @return {boolean}
  */
 function edgesEqual(edges1, edges2) {
+    edges2 = edges2.slice();
+
     if(edges1.length != edges2.length) {
-
+        return false;
     }
-}
 
-function edgesSubset(edges1, edges2) {
-    for(var i = 0; i < this.nodes.length; i++) {
-        for(var j = 0; j < this.nodes.length; j++) {
+    for(var i = 0; i < edges1.length; i++) {
+        var index = edges2.findIndex((e) => {
+            return edges1[i].to == e.to && edges1[i].label == e.label;
+        });
 
+        if(index > -1) {
+            edges2.splice(index, 1);
+        } else {
+            return false;
         }
     }
+    return true;
 }
 
 class NFA {
+    //TODO: keep track of start when removing
+
     constructor(nodes) {
         this.nodes = nodes;
     }
@@ -47,11 +56,52 @@ class NFA {
     }
 
     minimize() {
-        for(var i = 0; i < this.nodes.length; i++) {
-            for(var j = i + 1; j < this.nodes.length; j++) {
+        var reduced = false;
 
+        for(var i = 0; i < this.nodes.length; i++) {
+            var allEpsilon = this.nodes[i].edges.length > 0;
+            for(var edge of this.nodes[i].edges) {
+                if(edge.label != 'ϵ') {
+                    allEpsilon = false;
+                    break;
+                }
+            }
+
+            if(allEpsilon) {
+                reduced = true;
+                for(var edge of this.getEdgesToNode(this.nodes[i].id)) {
+                    edge.toNode = this.nodes[i].edges[0].toNode;
+                    for(var j = 1; j < this.nodes[i].edges.length; j++) {
+                        edge.fromNode.addEdge(this.nodes[i].edges[j].toNode, edge.label);
+                    }
+                }
+                this.nodes.splice(i, 1);
+            } else {
+                for(var j = i + 1; j < this.nodes.length; j++) {
+                    if(edgesEqual(this.nodes[i].edges, this.nodes[j].edges)) {
+                        reduced = true;
+                        for(var edge of this.getEdgesToNode(this.nodes[j].id)) {
+                            edge.toNode = this.nodes[i];
+                        }
+                        this.nodes.splice(j, 1);
+                    }
+                }
             }
         }
+
+        return reduced;
+    }
+
+    getEdgesToNode(id) {
+        var edges = [];
+        for(var node of this.nodes) {
+            for(var edge of node.edges) {
+                if(edge.to == id) {
+                    edges.push(edge);
+                }
+            }
+        }
+        return edges;
     }
 }
 
@@ -65,13 +115,13 @@ class Node {
     }
 
     /**
-     * @param {Node|number} to
+     * @param {Node} toNode
      * @param {string} label
      */
-    addEdge(to, label) {
+    addEdge(toNode, label) {
         this.edges.push({
-            from: this.id,
-            to: (typeof to == 'object' ? to.id : to),
+            fromNode: this,
+            toNode: toNode,
             label: label,
             arrows: 'to',
             font: {
@@ -82,7 +132,13 @@ class Node {
             },
             color: {
                 color: 'white',
-            }
+            },
+            get to() {
+                return this.toNode.id;
+            },
+            get from() {
+                return this.fromNode.id;
+            },
         });
     }
 }
@@ -242,6 +298,7 @@ export default {
                     id: node.id,
                 });
             }*/
+            while(nfa.minimize());
 
             var nodesSet = new vis.DataSet(nfa.nodes);
 
