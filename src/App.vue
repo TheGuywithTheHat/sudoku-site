@@ -13,6 +13,7 @@
 
 <script>
 import SudokuPage from './SudokuPage.vue';
+import MainPage from './MainPage.vue';
 import NFAaaS from './NFAaaS.vue';
 import VueRouter from 'vue-router';
 import 'purecss/build/pure-min.css';
@@ -20,7 +21,7 @@ import 'purecss/build/grids-responsive-min.css';
 
 var router = new VueRouter({
     routes: [
-        { path: '/', component: null},
+        { path: '/', component: MainPage},
         { path: '/sudoku', component: SudokuPage},
         { path: '/nfaaas', component: NFAaaS},
     ],
