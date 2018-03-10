@@ -314,7 +314,14 @@ export default {
                 nodes: nodesSet,
                 edges: edgesSet,
             };
-            var options = {};
+            var options = {
+                physics: {
+                    barnesHut: {
+                        springConstant: 0.01,
+                        avoidOverlap: 1,
+                    },
+                },
+            };
             var network = new vis.Network(container, data, options);
         },
     },
